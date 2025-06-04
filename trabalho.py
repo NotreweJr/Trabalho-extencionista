@@ -86,3 +86,36 @@ ax3.set_ylabel("Quantidade de Furtos", fontsize=10)
 ax3.legend(title="Bairro", bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=8)
 plt.xticks(rotation=45)
 st.pyplot(fig3)
+
+# -----------------------------------
+# Horários de pico dos furtos
+# -----------------------------------
+st.header("Horários de Pico dos Furtos")
+
+# Função auxiliar para extrair a hora corretamente
+def extrair_hora(valor):
+    try:
+        if pd.isna(valor):
+            return None
+        valor = str(valor).strip().zfill(4)  # Ex: 815 -> "0815"
+        hora = int(valor[:2])
+        if 0 <= hora <= 23:
+            return hora
+    except:
+        return None
+    return None
+
+# Aplica a função à coluna "Horário Fato"
+df_pa["Hora Fato"] = df_pa["Horário Fato"].apply(extrair_hora)
+
+# Conta quantos furtos ocorreram em cada hora
+furtos_por_hora = df_pa["Hora Fato"].value_counts().sort_index()
+
+# Gráfico de barras dos horários de pico
+fig4, ax4 = plt.subplots(figsize=(10, 4))
+sns.barplot(x=furtos_por_hora.index, y=furtos_por_hora.values, ax=ax4, color='salmon')
+ax4.set_xlabel("Hora do Dia", fontsize=10)
+ax4.set_ylabel("Quantidade de Furtos", fontsize=10)
+ax4.set_title("Furtos por Hora do Dia - Pouso Alegre", fontsize=12)
+plt.xticks(range(0, 24))
+st.pyplot(fig4)
