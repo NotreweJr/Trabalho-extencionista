@@ -30,7 +30,7 @@ top_bairros.plot.pie(
     startangle=90,
     shadow=True,
     ax=ax1,
-    textprops={'fontsize': 10}  # diminui o tamanho das letras
+    textprops={'fontsize': 6}  # diminui o tamanho das letras
 )
 ax1.set_ylabel('')
 ax1.set_title('Top 10 Bairros com Mais Furtos - Pouso Alegre')
