@@ -14,7 +14,7 @@ def carregar_dados():
     df.columns = df.columns.str.strip()
     df_pa = df[df["Município"].str.upper() == "POUSO ALEGRE"]
     df_pa.loc[:, "Data Fato"] = pd.to_datetime(df_pa["Data Fato"], errors="coerce")
-    df_pa = df_pa.dropna(subset=["Data Fato"])  # Remove linhas com data inválida
+    df_pa = df_pa.dropna(subset=["Data Fato"])  
     df_pa = df_pa[~df_pa["Bairro - FATO FINAL"].str.upper().isin(["DESCONHECIDO", "NÃO CADASTRADO", ""])]
     if "Ano Fato" not in df_pa.columns:
         df_pa["Ano Fato"] = df_pa["Data Fato"].dt.year
@@ -22,11 +22,11 @@ def carregar_dados():
 
 df_pa = carregar_dados()
 
-# Garantia extra: converter e limpar novamente (evita erro no .dt)
+# Converter e limpar
 df_pa["Data Fato"] = pd.to_datetime(df_pa["Data Fato"], errors="coerce")
 df_pa = df_pa.dropna(subset=["Data Fato"]).copy()
 
-# Usar coluna 'Dia da Semana Fato' se existir, senão calcula com tradução
+# Dia da Semana Fato
 if "Dia da Semana Fato" in df_pa.columns:
     df_pa["Dia da Semana"] = df_pa["Dia da Semana Fato"].str.lower().str.strip()
 else:
@@ -43,7 +43,7 @@ else:
     df_pa["Dia da Semana"] = df_pa["Dia da Semana"].map(dias_pt)
 
 # Top 10 bairros
-st.header("Top 10 Bairros com Mais Furtos")
+st.header("10 Bairros com Maior Incidência de Furtos")
 top_bairros = df_pa["Bairro - FATO FINAL"].str.upper().value_counts().head(10)
 top_bairros_com_total = pd.concat([top_bairros, pd.Series({"TOTAL": top_bairros.sum()})])
 st.write("**Total de furtos nos 10 bairros mais afetados:**")
@@ -56,7 +56,7 @@ ax1.set_title('Top 10 Bairros com Mais Furtos', fontsize=12)
 st.pyplot(fig1)
 
 # Evolução anual
-st.header("Evolução dos Furtos por Ano")
+st.header("Evolução dos Furtos por Ano (2025 dados ate Abril")
 furtos_por_ano = df_pa["Ano Fato"].value_counts().sort_index()
 fig2, ax2 = plt.subplots(figsize=(8, 4))
 sns.barplot(x=furtos_por_ano.index.astype(str), y=furtos_por_ano.values, ax=ax2)
@@ -67,7 +67,7 @@ plt.xticks(rotation=45)
 st.pyplot(fig2)
 
 # Evolução por bairro (top 10)
-st.header("Evolução dos Furtos por Bairro (Top 10)")
+st.header("Evolução dos Furtos por Bairro")
 bairros_top10 = [
     "CENTRO", "SAO GERALDO", "JARDIM OLIMPICO", "CRUZEIRO", "FOCH",
     "SAO JOAO", "ARVORE GRANDE", "PRIMAVERA", "SAO CARLOS", "FATIMA I"
@@ -134,7 +134,7 @@ st.pyplot(fig_mes)
 
 # Tipo de local mais visado (coluna "Descrição Local Imediato")
 if "Descrição Local Imediato" in df_pa.columns:
-    st.header("Top 10 Locais mais Visados")
+    st.header("10 Locais mais Visados")
     locais_comuns = df_pa["Descrição Local Imediato"].value_counts().head(10)
     fig_locais, ax_locais = plt.subplots()
     sns.barplot(y=locais_comuns.index, x=locais_comuns.values, ax=ax_locais, palette="OrRd")
