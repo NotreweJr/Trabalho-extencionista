@@ -1,42 +1,42 @@
-import streamlit as st
 import pandas as pd
+import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-st.set_page_config(page_title="Análise de Furtos em Pouso Alegre", layout="wide")
-st.title("🔍 Análise de Furtos em Pouso Alegre")
-st.markdown("Dados de 2022 até abril de 2025 (fonte: governo estadual)")
+st.title("Análise de Furtos em Pouso Alegre")
+
+# Caminho do arquivo CSV no seu computador
+caminho_arquivo = "Alvos - Furto - Jan 2022 a Abr 2025.csv"
 
 @st.cache_data
 def carregar_dados():
-    caminho_arquivo = "Alvos - Furto - Jan 2022 a Abr 2025.csv"
-    df = pd.read_csv(caminho_arquivo, sep=";", encoding="latin1")
-    return df
+    df = pd.read_csv(caminho_arquivo, sep=';', encoding='latin1')
+    df.columns = df.columns.str.strip()
+    df_pa = df[df["Município"].str.upper() == "POUSO ALEGRE"]
+    df_pa.loc[:, "Data Fato"] = pd.to_datetime(df_pa["Data Fato"], errors="coerce")
+    df_pa = df_pa[~df_pa["Bairro - FATO FINAL"].str.upper().isin(["DESCONHECIDO", "NÃO CADASTRADO", ""])]
+    return df_pa
 
-df = carregar_dados()
+df_pa = carregar_dados()
 
-# Filtrar apenas furtos da cidade Pouso Alegre (ajuste se o nome for diferente)
-cidade = "Pouso Alegre"
-df_pa = df[df['Cidade'].str.strip().str.upper() == cidade.upper()]
+st.header("Top 10 Bairros com Mais Furtos")
+top_bairros = df_pa["Bairro - FATO FINAL"].value_counts().head(10)
+st.write(top_bairros)
 
-# Contar furtos por bairro e pegar os 10 maiores
-furtos_bairros = df_pa['Bairro'].value_counts().head(10)
+# Gráfico de pizza
+fig1, ax1 = plt.subplots()
+top_bairros.plot.pie(autopct='%1.1f%%', startangle=90, shadow=True, ax=ax1)
+ax1.set_ylabel('')
+ax1.set_title('Top 10 Bairros com Mais Furtos - Pouso Alegre')
+st.pyplot(fig1)
 
-# Exibir tabela
-st.subheader("Top 10 bairros com mais furtos")
-st.table(furtos_bairros)
-
-# Gráfico de barras
-st.subheader("Gráfico de barras - Furtos por bairro")
-fig, ax = plt.subplots(figsize=(10, 5))
-sns.barplot(x=furtos_bairros.values, y=furtos_bairros.index, palette="viridis", ax=ax)
-ax.set_xlabel("Número de furtos")
-ax.set_ylabel("Bairro")
-st.pyplot(fig)
-
-# Gráfico pizza
-st.subheader("Gráfico de pizza - Percentual de furtos por bairro")
-fig2, ax2 = plt.subplots()
-ax2.pie(furtos_bairros.values, labels=furtos_bairros.index, autopct='%1.1f%%', startangle=140)
-ax2.axis('equal')  # para círculo perfeito
+# Gráfico de barras corrigido (sem palette para evitar warning)
+st.header("Evolução dos Furtos por Ano")
+furtos_por_ano = df_pa["Ano Fato"].value_counts().sort_index()
+fig2, ax2 = plt.subplots(figsize=(10, 6))
+sns.barplot(x=furtos_por_ano.index.astype(str), y=furtos_por_ano.values, ax=ax2)
+ax2.set_xlabel('Ano')
+ax2.set_ylabel('Quantidade de Furtos')
+ax2.set_title('Evolução dos Furtos por Ano - Pouso Alegre')
+plt.xticks(rotation=45)
 st.pyplot(fig2)
