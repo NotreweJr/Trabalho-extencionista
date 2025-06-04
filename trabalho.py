@@ -42,7 +42,7 @@ else:
     }
     df_pa["Dia da Semana"] = df_pa["Dia da Semana"].map(dias_pt)
 
-# Top 10 bairros
+# 10 bairros
 st.header("10 Bairros com Maior Incidência de Furtos")
 top_bairros = df_pa["Bairro - FATO FINAL"].str.upper().value_counts().head(10)
 top_bairros_com_total = pd.concat([top_bairros, pd.Series({"TOTAL": top_bairros.sum()})])
@@ -132,7 +132,7 @@ ax_mes.set_ylabel("Ocorrências")
 plt.xticks(rotation=45)
 st.pyplot(fig_mes)
 
-# Tipo de local mais visado (coluna "Descrição Local Imediato")
+# Tipo de local mais visado
 if "Descrição Local Imediato" in df_pa.columns:
     st.header("10 Locais mais Visados")
     locais_comuns = df_pa["Descrição Local Imediato"].value_counts().head(10)
