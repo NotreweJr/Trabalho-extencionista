@@ -3,10 +3,11 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-st.set_page_config(layout="centered")  # Layout mais estreito
+# Configuração da página
+st.set_page_config(layout="centered")
 st.title("Análise de Furtos em Pouso Alegre")
 
-# Caminho do arquivo CSV no seu computador
+# Caminho do arquivo CSV
 caminho_arquivo = "Alvos - Furto - Jan 2022 a Abr 2025.csv"
 
 @st.cache_data
@@ -16,42 +17,39 @@ def carregar_dados():
     df_pa = df[df["Município"].str.upper() == "POUSO ALEGRE"]
     df_pa.loc[:, "Data Fato"] = pd.to_datetime(df_pa["Data Fato"], errors="coerce")
     df_pa = df_pa[~df_pa["Bairro - FATO FINAL"].str.upper().isin(["DESCONHECIDO", "NÃO CADASTRADO", ""])]
-    
-    # Cria a coluna do ano se ainda não existir
     if "Ano Fato" not in df_pa.columns:
         df_pa["Ano Fato"] = df_pa["Data Fato"].dt.year
     return df_pa
 
 df_pa = carregar_dados()
 
-# -----------------------------
-# Top 10 Bairros com mais furtos
-# -----------------------------
+# -----------------------------------
+# Top 10 bairros com mais furtos
+# -----------------------------------
 st.header("Top 10 Bairros com Mais Furtos")
-top_bairros = df_pa["Bairro - FATO FINAL"].value_counts().head(10)
+top_bairros = df_pa["Bairro - FATO FINAL"].str.upper().value_counts().head(10)
 st.write(top_bairros)
 
-# Gráfico de pizza (tamanho reduzido)
-fig1, ax1 = plt.subplots(figsize=(6, 6))  # Tamanho reduzido
+# Gráfico de pizza
+fig1, ax1 = plt.subplots(figsize=(6, 6))
 top_bairros.plot.pie(
     autopct='%1.1f%%', 
     startangle=90, 
     shadow=False, 
     ax=ax1,
-    textprops={'fontsize': 8}  # Fonte menor
+    textprops={'fontsize': 8}
 )
 ax1.set_ylabel('')
 ax1.set_title('Top 10 Bairros com Mais Furtos', fontsize=12)
 st.pyplot(fig1)
 
-# -----------------------------
-# Gráfico de barras: Furtos por ano
-# -----------------------------
+# -----------------------------------
+# Evolução dos furtos por ano
+# -----------------------------------
 st.header("Evolução dos Furtos por Ano")
 furtos_por_ano = df_pa["Ano Fato"].value_counts().sort_index()
-fig2, ax2 = plt.subplots(figsize=(8, 4))  # Altura reduzida
+fig2, ax2 = plt.subplots(figsize=(8, 4))
 sns.barplot(x=furtos_por_ano.index.astype(str), y=furtos_por_ano.values, ax=ax2)
-
 ax2.set_xlabel('Ano', fontsize=10)
 ax2.set_ylabel('Quantidade de Furtos', fontsize=10)
 ax2.set_title('Evolução dos Furtos por Ano - Pouso Alegre', fontsize=12)
@@ -59,3 +57,32 @@ ax2.tick_params(axis='x', labelsize=8)
 ax2.tick_params(axis='y', labelsize=8)
 plt.xticks(rotation=45)
 st.pyplot(fig2)
+
+# -----------------------------------
+# Evolução dos furtos nos 10 bairros
+# -----------------------------------
+st.header("Evolução dos Furtos por Bairro (Top 10)")
+
+bairros_top10 = [
+    "CENTRO", "SAO GERALDO", "JARDIM OLIMPICO", "CRUZEIRO", "FOCH",
+    "SAO JOAO", "ARVORE GRANDE", "PRIMAVERA", "SAO CARLOS", "FATIMA I"
+]
+
+# Filtrar dados dos top 10 bairros
+df_top_bairros = df_pa[df_pa["Bairro - FATO FINAL"].str.upper().isin(bairros_top10)]
+
+# Agrupar por ano e bairro
+evolucao = df_top_bairros.groupby(
+    [df_top_bairros["Ano Fato"], df_top_bairros["Bairro - FATO FINAL"].str.upper()]
+).size().unstack(fill_value=0)
+
+# Gráfico de linha
+fig3, ax3 = plt.subplots(figsize=(10, 6))
+evolucao.plot(ax=ax3, marker='o')
+
+ax3.set_title("Evolução Anual dos Furtos por Bairro - Pouso Alegre", fontsize=12)
+ax3.set_xlabel("Ano", fontsize=10)
+ax3.set_ylabel("Quantidade de Furtos", fontsize=10)
+ax3.legend(title="Bairro", bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=8)
+plt.xticks(rotation=45)
+st.pyplot(fig3)
