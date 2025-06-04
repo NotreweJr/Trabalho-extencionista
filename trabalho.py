@@ -31,8 +31,11 @@ st.header("Top 10 Bairros com Mais Furtos")
 # Top 10 bairros
 top_bairros = df_pa["Bairro - FATO FINAL"].str.upper().value_counts().head(10)
 
-# Adiciona linha TOTAL
-top_bairros_com_total = top_bairros.append(pd.Series({"TOTAL": top_bairros.sum()}))
+# Adiciona linha TOTAL usando concat
+top_bairros_com_total = pd.concat([
+    top_bairros,
+    pd.Series({"TOTAL": top_bairros.sum()})
+])
 
 # Exibe a tabela com total
 st.write("**Total de furtos nos 10 bairros mais afetados:**")
@@ -98,7 +101,7 @@ st.pyplot(fig3)
 # -----------------------------------
 st.header("Horários de Pico dos Furtos")
 
-# Função auxiliar para extrair a hora corretamente
+# Função para extrair hora corretamente
 def extrair_hora(valor):
     try:
         if pd.isna(valor):
@@ -111,10 +114,10 @@ def extrair_hora(valor):
         return None
     return None
 
-# Aplica a função à coluna "Horário Fato"
+# Aplica a função
 df_pa["Hora Fato"] = df_pa["Horário Fato"].apply(extrair_hora)
 
-# Conta quantos furtos ocorreram em cada hora
+# Conta furtos por hora
 furtos_por_hora = df_pa["Hora Fato"].value_counts().sort_index()
 
 # Gráfico de barras dos horários de pico
