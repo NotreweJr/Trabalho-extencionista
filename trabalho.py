@@ -14,6 +14,7 @@ def carregar_dados():
     df.columns = df.columns.str.strip()
     df_pa = df[df["Município"].str.upper() == "POUSO ALEGRE"]
     df_pa.loc[:, "Data Fato"] = pd.to_datetime(df_pa["Data Fato"], errors="coerce")
+    df_pa = df_pa.dropna(subset=["Data Fato"])  # Remove linhas com data inválida
     df_pa = df_pa[~df_pa["Bairro - FATO FINAL"].str.upper().isin(["DESCONHECIDO", "NÃO CADASTRADO", ""])]
     if "Ano Fato" not in df_pa.columns:
         df_pa["Ano Fato"] = df_pa["Data Fato"].dt.year
