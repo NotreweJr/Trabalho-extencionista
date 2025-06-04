@@ -25,10 +25,17 @@ st.write(top_bairros)
 
 # Gráfico de pizza
 fig1, ax1 = plt.subplots()
-top_bairros.plot.pie(autopct='%1.1f%%', startangle=90, shadow=True, ax=ax1)
+top_bairros.plot.pie(
+    autopct='%1.1f%%',
+    startangle=90,
+    shadow=True,
+    ax=ax1,
+    textprops={'fontsize': 10}  # diminui o tamanho das letras
+)
 ax1.set_ylabel('')
 ax1.set_title('Top 10 Bairros com Mais Furtos - Pouso Alegre')
 st.pyplot(fig1)
+
 
 # Gráfico de barras corrigido (sem palette para evitar warning)
 st.header("Evolução dos Furtos por Ano")
