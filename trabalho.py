@@ -24,18 +24,26 @@ def carregar_dados():
 df_pa = carregar_dados()
 
 # -----------------------------------
-# Top 10 bairros com mais furtos
+# Top 10 bairros com mais furtos + TOTAL
 # -----------------------------------
 st.header("Top 10 Bairros com Mais Furtos")
+
+# Top 10 bairros
 top_bairros = df_pa["Bairro - FATO FINAL"].str.upper().value_counts().head(10)
-st.write(top_bairros)
+
+# Adiciona linha TOTAL
+top_bairros_com_total = top_bairros.append(pd.Series({"TOTAL": top_bairros.sum()}))
+
+# Exibe a tabela com total
+st.write("**Total de furtos nos 10 bairros mais afetados:**")
+st.dataframe(top_bairros_com_total.rename_axis("Bairro").reset_index(name="Furtos"), use_container_width=True)
 
 # Gráfico de pizza
 fig1, ax1 = plt.subplots(figsize=(6, 6))
 top_bairros.plot.pie(
-    autopct='%1.1f%%', 
-    startangle=90, 
-    shadow=False, 
+    autopct='%1.1f%%',
+    startangle=90,
+    shadow=False,
     ax=ax1,
     textprops={'fontsize': 8}
 )
@@ -53,8 +61,6 @@ sns.barplot(x=furtos_por_ano.index.astype(str), y=furtos_por_ano.values, ax=ax2)
 ax2.set_xlabel('Ano', fontsize=10)
 ax2.set_ylabel('Quantidade de Furtos', fontsize=10)
 ax2.set_title('Evolução dos Furtos por Ano - Pouso Alegre', fontsize=12)
-ax2.tick_params(axis='x', labelsize=8)
-ax2.tick_params(axis='y', labelsize=8)
 plt.xticks(rotation=45)
 st.pyplot(fig2)
 
