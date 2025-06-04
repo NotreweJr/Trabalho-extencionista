@@ -22,6 +22,12 @@ def carregar_dados():
 
 df_pa = carregar_dados()
 
+# Garantia extra: converter e limpar novamente (evita erro no .dt)
+df_pa["Data Fato"] = pd.to_datetime(df_pa["Data Fato"], errors="coerce")
+df_pa = df_pa.dropna(subset=["Data Fato"]).copy()
+
+df_pa["Dia da Semana"] = df_pa["Data Fato"].dt.day_name(locale='pt_BR')
+
 # Top 10 bairros
 st.header("Top 10 Bairros com Mais Furtos")
 top_bairros = df_pa["Bairro - FATO FINAL"].str.upper().value_counts().head(10)
@@ -90,7 +96,6 @@ st.pyplot(fig4)
 
 # Furtos por dia da semana
 st.header("Furtos por Dia da Semana")
-df_pa["Dia da Semana"] = df_pa["Data Fato"].dt.day_name(locale='pt_BR')
 ordem_dias = ["segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado", "domingo"]
 furtos_por_dia = df_pa["Dia da Semana"].value_counts().reindex(ordem_dias)
 fig_dia, ax_dia = plt.subplots()
