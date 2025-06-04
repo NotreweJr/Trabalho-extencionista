@@ -6,7 +6,7 @@ import seaborn as sns
 st.title("Análise de Furtos em Pouso Alegre")
 
 # Caminho do arquivo CSV no seu computador
-caminho_arquivo = r"C:\Users\ewert\Desktop\trabalho extencionista\Alvos - Furto - Jan 2022 a Abr 2025.csv"
+caminho_arquivo = "Alvos - Furto - Jan 2022 a Abr 2025.csv"
 
 @st.cache_data
 def carregar_dados():
