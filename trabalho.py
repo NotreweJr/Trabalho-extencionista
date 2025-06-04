@@ -52,7 +52,7 @@ st.dataframe(top_bairros_com_total.rename_axis("Bairro").reset_index(name="Furto
 fig1, ax1 = plt.subplots(figsize=(6, 6))
 top_bairros.plot.pie(autopct='%1.1f%%', startangle=90, shadow=False, ax=ax1, textprops={'fontsize': 8})
 ax1.set_ylabel('')
-ax1.set_title('Top 10 Bairros com Mais Furtos', fontsize=12)
+ax1.set_title('Os 10 Bairros com Mais Furtos', fontsize=12)
 st.pyplot(fig1)
 
 # Evolução anual
