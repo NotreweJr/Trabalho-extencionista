@@ -22,6 +22,7 @@ def carregar_dados():
 
 df_pa = carregar_dados()
 
+
 # Converter e limpar
 df_pa["Data Fato"] = pd.to_datetime(df_pa["Data Fato"], errors="coerce")
 df_pa = df_pa.dropna(subset=["Data Fato"]).copy()
