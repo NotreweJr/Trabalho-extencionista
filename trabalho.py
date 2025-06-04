@@ -26,7 +26,21 @@ df_pa = carregar_dados()
 df_pa["Data Fato"] = pd.to_datetime(df_pa["Data Fato"], errors="coerce")
 df_pa = df_pa.dropna(subset=["Data Fato"]).copy()
 
-df_pa["Dia da Semana"] = df_pa["Data Fato"].dt.day_name(locale='pt_BR')
+# Usar coluna 'Dia da Semana Fato' se existir, senão calcula com tradução
+if "Dia da Semana Fato" in df_pa.columns:
+    df_pa["Dia da Semana"] = df_pa["Dia da Semana Fato"].str.lower().str.strip()
+else:
+    df_pa["Dia da Semana"] = df_pa["Data Fato"].dt.day_name()
+    dias_pt = {
+        "Monday": "segunda-feira",
+        "Tuesday": "terça-feira",
+        "Wednesday": "quarta-feira",
+        "Thursday": "quinta-feira",
+        "Friday": "sexta-feira",
+        "Saturday": "sábado",
+        "Sunday": "domingo"
+    }
+    df_pa["Dia da Semana"] = df_pa["Dia da Semana"].map(dias_pt)
 
 # Top 10 bairros
 st.header("Top 10 Bairros com Mais Furtos")
